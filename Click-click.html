@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <title>Click-click</title>
+        <style>
+            div {
+                width: 50px;
+                height: 50px;
+                border: 1px solid #000;
+            }
+            a {
+                color: #000;
+            }
+        </style>
+    </head>
+    <body>
+        <a href="http://78.47.75.106/e/test&par=1">Тык</a><br>
+        <a href="http://78.47.75.106/e/test&par=2">Клац</a><br>
+        <div id="addData"></div>
+
+        <script type="text/javascript">
+            document.getElementById('addData').innerHTML = sessionStorage.getItem('dataLinkNum');
+            switch (sessionStorage.getItem('dataLinkNum')) {
+                case '1':
+                    document.querySelector('a:first-of-type').style.fontWeight = 'bold';
+                    document.querySelector('a:nth-of-type(2)').style.fontWeight = 'normal';
+                    break;
+                case '2':
+                    document.querySelector('a:first-of-type').style.fontWeight = 'normal';
+                    document.querySelector('a:nth-of-type(2)').style.fontWeight = 'bold';
+                    break;
+                default:
+                    document.querySelector('a:first-of-type').style.fontWeight = 'normal';
+                    document.querySelector('a:nth-of-type(2)').style.fontWeight = 'normal';
+            }
+
+            function getJSON () {
+                var url = event.currentTarget.getAttribute('href');
+                event.preventDefault();
+                var jsonResp;
+                var http = new XMLHttpRequest();
+                http.open('GET', url);  // асинхронный (по умолчанию true) GET запрос страницы
+                http.onreadystatechange = function () {  // обратная связь: ответ на запрос
+                    if (this.readyState == 4 && this.status == 200) {
+                        jsonResp = JSON.parse(this.responseText);
+                        var jsonData = jsonResp['Data'];
+                        document.getElementById('addData').innerHTML = jsonData;
+                        if (jsonData === '1' &&
+                                jsonData !== sessionStorage.getItem('dataLinkNum')) {
+                            document.querySelector('a:first-of-type').style.fontWeight = 'bold';
+                            document.querySelector('a:nth-of-type(2)').style.fontWeight = 'normal';
+                        } else if (jsonData === '2' &&
+                                jsonData !== sessionStorage.getItem('dataLinkNum')) {
+                            document.querySelector('a:first-of-type').style.fontWeight = 'normal';
+                            document.querySelector('a:nth-of-type(2)').style.fontWeight = 'bold';
+                        }
+                        sessionStorage.setItem('dataLinkNum', jsonData);
+                    }
+                };
+                http.send(null);  // запрос
+            }
+
+            document.querySelector('a:first-of-type').addEventListener('click', getJSON, false);
+            document.querySelector('a:nth-of-type(2)').addEventListener('click', getJSON, false);
+        </script>
+    </body>
+</html>
