@@ -15,54 +15,58 @@
         </style>
     </head>
     <body>
-        <a href="http://78.47.75.106/e/test&par=1">Тык</a><br>
-        <a href="http://78.47.75.106/e/test&par=2">Клац</a><br>
+        <a id="link-1" class="link" href="#1">Тык</a><br> <!--http://78.47.75.106/e/test&par=1-->
+        <a id="link-2" class="link" href="#2">Клац</a><br> <!--http://78.47.75.106/e/test&par=2-->
         <div id="addData"></div>
 
         <script type="text/javascript">
-            document.getElementById('addData').innerHTML = sessionStorage.getItem('dataLinkNum');
-            switch (sessionStorage.getItem('dataLinkNum')) {
-                case '1':
-                    document.querySelector('a:first-of-type').style.fontWeight = 'bold';
-                    document.querySelector('a:nth-of-type(2)').style.fontWeight = 'normal';
-                    break;
-                case '2':
-                    document.querySelector('a:first-of-type').style.fontWeight = 'normal';
-                    document.querySelector('a:nth-of-type(2)').style.fontWeight = 'bold';
-                    break;
-                default:
-                    document.querySelector('a:first-of-type').style.fontWeight = 'normal';
-                    document.querySelector('a:nth-of-type(2)').style.fontWeight = 'normal';
-            }
+//            document.getElementById('addData').innerHTML = sessionStorage.getItem('dataLinkNum');
+//            switch (sessionStorage.getItem('dataLinkNum')) {
+//                case '1':
+//                    document.querySelector('a:first-of-type').style.fontWeight = 'bold';
+//                    document.querySelector('a:nth-of-type(2)').style.fontWeight = 'normal';
+//                    break;
+//                case '2':
+//                    document.querySelector('a:first-of-type').style.fontWeight = 'normal';
+//                    document.querySelector('a:nth-of-type(2)').style.fontWeight = 'bold';
+//                    break;
+//                default:
+//                    document.querySelector('a:first-of-type').style.fontWeight = 'normal';
+//                    document.querySelector('a:nth-of-type(2)').style.fontWeight = 'normal';
+//            }
 
             function getJSON () {
                 var url = event.currentTarget.getAttribute('href');
                 event.preventDefault();
+            }
+
+            function func () {
+                var url = 'http://78.47.75.106/e/test&par=' + window.location.hash.substr(1);
+//                console.log(url);
                 var jsonResp;
                 var http = new XMLHttpRequest();
                 http.open('GET', url);  // асинхронный (по умолчанию true) GET запрос страницы
                 http.onreadystatechange = function () {  // обратная связь: ответ на запрос
                     if (this.readyState == 4 && this.status == 200) {
+                        // зная хэш, составляем id = 'link' + window.location.hash.substr(1);
+                        // пробегаемся по ссылкам, "нормалим", если жирные(?), если с id — "жирним".
                         jsonResp = JSON.parse(this.responseText);
                         var jsonData = jsonResp['Data'];
                         document.getElementById('addData').innerHTML = jsonData;
-                        if (jsonData === '1' &&
-                                jsonData !== sessionStorage.getItem('dataLinkNum')) {
+                        if (jsonData === '1') {
                             document.querySelector('a:first-of-type').style.fontWeight = 'bold';
                             document.querySelector('a:nth-of-type(2)').style.fontWeight = 'normal';
-                        } else if (jsonData === '2' &&
-                                jsonData !== sessionStorage.getItem('dataLinkNum')) {
+                        } else if (jsonData === '2') {
                             document.querySelector('a:first-of-type').style.fontWeight = 'normal';
                             document.querySelector('a:nth-of-type(2)').style.fontWeight = 'bold';
                         }
-                        sessionStorage.setItem('dataLinkNum', jsonData);
                     }
                 };
                 http.send(null);  // запрос
             }
 
-            document.querySelector('a:first-of-type').addEventListener('click', getJSON, false);
-            document.querySelector('a:nth-of-type(2)').addEventListener('click', getJSON, false);
+//            document.querySelector('a:first-of-type').addEventListener('click', getJSON, false);
+            window.addEventListener('hashchange', func, false);
         </script>
     </body>
 </html>
