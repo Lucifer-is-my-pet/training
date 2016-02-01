@@ -56,7 +56,7 @@
                 http.send(null);  // запрос
             }
 
-            window.addEventListener('hashchange', reactOnHashChange, false);
+            window.onhashchange = reactOnHashChange;
         </script>
     </body>
 </html>
