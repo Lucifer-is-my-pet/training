@@ -19,27 +19,31 @@
         <a id="link-2" class="link" href="#2">Клац</a><br>
         <div id="addData"></div>
         <script type="text/javascript">
-            var pattern = 'http://78.47.75.106/e/test&par=';
-            if (window.location.hash) {
-                var hash = window.location.hash.substr(1);
-                document.getElementById('link-' + hash).style.fontWeight = 'bold';
-                var url = pattern + hash;
-                addDataToDiv(url);
+            if (location.hash) {
+                reactOnHashChange();
+            }
+
+            var links = document.querySelectorAll('a');
+
+            function getUrl () {
+                return 'http://78.47.75.106/e/test&par=' + location.hash.substr(1);
             }
 
             function reactOnHashChange () {
-                var hash = window.location.hash.substr(1);
-                var url = pattern + hash;
-                addDataToDiv(url);
+                var hash = location.hash.substr(1);
+                addDataToDiv(getUrl());
 
-                var links = document.querySelectorAll('a');
                 for (var i = 0; i < links.length; i++) {
-                    if (links[i].style.fontWeight == 'bold') {
-                        links[i].style.fontWeight = 'normal';
-                    }
-                    if (links[i].getAttribute('href').substr(1) == hash) {
-                        links[i].style.fontWeight = 'bold';
-                    }
+                    var link = links[i];
+                    link.style.fontWeight = '';
+                    if (link.getAttribute('href').substr(1) == hash)
+                        link.style.fontWeight = 'bold';
+                }
+            }
+
+            function reactOnClick () {
+                if (event.currentTarget.style.fontWeight == 'bold') {
+                    addDataToDiv(getUrl());
                 }
             }
 
@@ -56,7 +60,10 @@
                 http.send(null);  // запрос
             }
 
-            window.onhashchange = reactOnHashChange;
+            onhashchange = reactOnHashChange;
+            for (var i = 0; i < links.length; i++) {
+                links[i].onclick = reactOnClick;
+            }
         </script>
     </body>
 </html>
