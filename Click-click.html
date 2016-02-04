@@ -5,7 +5,7 @@
         <title>Click-click</title>
         <style>
             div {
-                width: 50px;
+                width: 100px;
                 height: 50px;
                 border: 1px solid #000;
             }
@@ -17,33 +17,30 @@
     <body>
         <a id="link-1" class="link" href="#1">Тык</a><br>
         <a id="link-2" class="link" href="#2">Клац</a><br>
-        <div id="addData"></div>
+        <div id="addData">
+        </div>
         <script type="text/javascript">
-            if (location.hash) {
-                reactOnHashChange();
-            }
-
-            var links = document.querySelectorAll('a');
+            reactOnHashChange();
 
             function getUrl () {
                 return 'http://78.47.75.106/e/test&par=' + location.hash.substr(1);
             }
 
             function reactOnHashChange () {
+                console.log(location.hash);
                 var hash = location.hash.substr(1);
                 addDataToDiv(getUrl());
 
+                var links = document.querySelectorAll('.link');
                 for (var i = 0; i < links.length; i++) {
                     var link = links[i];
                     link.style.fontWeight = '';
-                    if (link.getAttribute('href').substr(1) == hash)
-                        link.style.fontWeight = 'bold';
-                }
-            }
+                    link.onclick = null;
 
-            function reactOnClick () {
-                if (event.currentTarget.style.fontWeight == 'bold') {
-                    addDataToDiv(getUrl());
+                    if (link.getAttribute('href').substr(1) == hash) {
+                        link.style.fontWeight = 'bold';
+                        link.onclick = reactOnHashChange;
+                    }
                 }
             }
 
@@ -54,16 +51,38 @@
                 http.onreadystatechange = function () {  // обратная связь: ответ на запрос
                     if (this.readyState == 4 && this.status == 200) {
                         jsonResp = JSON.parse(this.responseText);
-                        document.getElementById('addData').innerHTML = jsonResp['Data'] || '';
+                        var jsonData = jsonResp['Data'] || '';
+                        document.getElementById('addData').innerHTML = jsonData;
+                        if (jsonData != '') {
+                            document.getElementById('addData').innerHTML +=
+                                    '<br><a id="change" href="/">Изменить</a>';
+                            document.getElementById('change').onclick = reactOnDataChange;
+                        }
                     }
                 };
                 http.send(null);  // запрос
             }
 
-            onhashchange = reactOnHashChange;
-            for (var i = 0; i < links.length; i++) {
-                links[i].onclick = reactOnClick;
+            function reactOnDataChange () {
+                event.preventDefault();
+                var newData = encodeURIComponent(prompt('Введите новые данные', ''));
+                var jsonResp;
+                var http = new XMLHttpRequest();
+                http.open('GET', getUrl() + '&value=' + newData);
+                http.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        jsonResp = JSON.parse(this.responseText);
+                        if (typeof jsonResp == 'object') {
+                            if (jsonResp['Result'] == 'OK') {
+                                addDataToDiv(getUrl());
+                            }
+                        }
+                    }
+                };
+                http.send(null);
             }
+
+            onhashchange = reactOnHashChange;
         </script>
     </body>
 </html>
