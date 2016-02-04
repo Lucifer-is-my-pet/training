@@ -45,12 +45,9 @@
             }
 
             function addDataToDiv (url) {
-                var jsonResp;
-                var http = new XMLHttpRequest();
-                http.open('GET', url);  // асинхронный (по умолчанию true) GET запрос страницы
-                http.onreadystatechange = function () {  // обратная связь: ответ на запрос
+                var addDataAndButton = function () {
                     if (this.readyState == 4 && this.status == 200) {
-                        jsonResp = JSON.parse(this.responseText);
+                        var jsonResp = JSON.parse(this.responseText);
                         var jsonData = jsonResp['Data'] || '';
                         document.getElementById('addData').innerHTML = jsonData;
                         if (jsonData != '') {
@@ -60,18 +57,16 @@
                         }
                     }
                 };
-                http.send(null);  // запрос
+                requestPattern(addDataAndButton, url);
             }
 
             function reactOnDataChange () {
                 event.preventDefault();
                 var newData = encodeURIComponent(prompt('Введите новые данные', ''));
-                var jsonResp;
-                var http = new XMLHttpRequest();
-                http.open('GET', getUrl() + '&value=' + newData);
-                http.onreadystatechange = function () {
+                var url = getUrl() + '&value=' + newData;
+                var refreshData = function () {
                     if (this.readyState == 4 && this.status == 200) {
-                        jsonResp = JSON.parse(this.responseText);
+                        var jsonResp = JSON.parse(this.responseText);
                         if (typeof jsonResp == 'object') {
                             if (jsonResp['Result'] == 'OK') {
                                 addDataToDiv(getUrl());
@@ -79,6 +74,13 @@
                         }
                     }
                 };
+                requestPattern(refreshData, url);
+            }
+
+            function requestPattern (func, url) {
+                var http = new XMLHttpRequest();
+                http.open('GET', url);
+                http.onreadystatechange = func;
                 http.send(null);
             }
 
