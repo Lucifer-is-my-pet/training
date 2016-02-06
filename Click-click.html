@@ -60,7 +60,10 @@
                 requestPattern(addDataAndButton, url);
             }
 
-            function reactOnDataChange () {
+            function reactOnDataChange (event) {
+                if (!event) {
+                    event = window.event;
+                }
                 event.preventDefault();
                 var newData = encodeURIComponent(prompt('Введите новые данные', ''));
                 var url = getUrl() + '&value=' + newData;
