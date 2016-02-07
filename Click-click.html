@@ -22,10 +22,6 @@
         <script type="text/javascript">
             reactOnHashChange();
 
-            function getUrl () {
-                return 'http://78.47.75.106/e/test&par=' + location.hash.substr(1);
-            }
-
             function reactOnHashChange () {
                 console.log(location.hash);
                 var hash = location.hash.substr(1);
@@ -45,19 +41,15 @@
             }
 
             function addDataToDiv (url) {
-                var addDataAndButton = function () {
-                    if (this.readyState == 4 && this.status == 200) {
-                        var jsonResp = JSON.parse(this.responseText);
-                        var jsonData = jsonResp['Data'] || '';
-                        document.getElementById('addData').innerHTML = jsonData;
-                        if (jsonData != '') {
-                            document.getElementById('addData').innerHTML +=
-                                    '<br><a id="change" href="/">Изменить</a>';
-                            document.getElementById('change').onclick = reactOnDataChange;
-                        }
+                getData(url, function(json) {
+                    var jsonData = json['Data'] || '';
+                    getById('addData').innerHTML = jsonData;
+                    if (jsonData != '') {
+                        getById('addData').innerHTML +=
+                                '<br><a id="change" href="/">Изменить</a>';
+                        getById('change').onclick = reactOnDataChange;
                     }
-                };
-                requestPattern(addDataAndButton, url);
+                });
             }
 
             function reactOnDataChange (event) {
@@ -66,25 +58,37 @@
                 }
                 event.preventDefault();
                 var newData = encodeURIComponent(prompt('Введите новые данные', ''));
-                var url = getUrl() + '&value=' + newData;
-                var refreshData = function () {
-                    if (this.readyState == 4 && this.status == 200) {
-                        var jsonResp = JSON.parse(this.responseText);
-                        if (typeof jsonResp == 'object') {
-                            if (jsonResp['Result'] == 'OK') {
+                if (newData !== 'null') {
+                    var url = getUrl() + '&value=' + newData;
+                    getData(url, function (json) {
+                        if (typeof json == 'object') {
+                            if (json['Result'] == 'OK') {
                                 addDataToDiv(getUrl());
                             }
                         }
-                    }
-                };
-                requestPattern(refreshData, url);
+                    });
+                }
             }
 
-            function requestPattern (func, url) {
+            //вспомогательные функции
+            function getData(url, func) {
                 var http = new XMLHttpRequest();
                 http.open('GET', url);
-                http.onreadystatechange = func;
+                http.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        var jsonResp = JSON.parse(this.responseText);
+                        func(jsonResp);
+                    }
+                };
                 http.send(null);
+            }
+
+            function getUrl () {
+                return 'http://78.47.75.106/e/test&par=' + location.hash.substr(1);
+            }
+
+            function getById(id) {
+                return document.getElementById(id);
             }
 
             onhashchange = reactOnHashChange;
