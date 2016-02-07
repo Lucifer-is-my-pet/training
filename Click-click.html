@@ -57,14 +57,12 @@
                     event = window.event;
                 }
                 event.preventDefault();
-                var newData = encodeURIComponent(prompt('Введите новые данные', ''));
-                if (newData !== 'null') {
-                    var url = getUrl() + '&value=' + newData;
+                var newData = prompt('Введите новые данные', '');
+                if (newData) {
+                    var url = getUrl() + '&value=' + encodeURIComponent(newData);
                     getData(url, function (json) {
-                        if (typeof json == 'object') {
-                            if (json['Result'] == 'OK') {
-                                addDataToDiv(getUrl());
-                            }
+                        if (json['Result'] == 'OK') {
+                            reactOnHashChange();
                         }
                     });
                 }
@@ -76,7 +74,12 @@
                 http.open('GET', url);
                 http.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
-                        var jsonResp = JSON.parse(this.responseText);
+                        var jsonResp;
+                        try {
+                            jsonResp = JSON.parse(this.responseText);
+                        } catch (e) {
+                            jsonResp = {};
+                        }
                         func(jsonResp);
                     }
                 };
