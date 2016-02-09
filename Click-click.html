@@ -4,13 +4,50 @@
         <meta charset="utf-8">
         <title>Click-click</title>
         <style>
-            div {
+            #addData {
                 width: 100px;
                 height: 50px;
                 border: 1px solid #000;
             }
             a {
                 color: #000;
+            }
+
+            .dialog {
+                width: 400px;
+                height: 150px;
+                border: 1px solid #000;
+                border-radius: 3px;
+                z-index: 100;
+                display: flex;
+                flex-direction: column;
+                /*flex-wrap: wrap;*/
+                /*justify-content: center;*/
+            }
+
+            .title {
+                width: 100%;
+                height: 30px;
+                background-color: #bb1a1b; /*8A8EBB*/
+            }
+
+            .content {
+                width: 100%;
+                background-color: #feffe1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: space-around;
+            }
+
+            .button-panel {
+                width: 100%;
+                display: flex;
+                justify-content: space-around;
+            }
+
+            input {
+                width: 350px;
             }
         </style>
     </head>
@@ -95,6 +132,66 @@
             }
 
             onhashchange = reactOnHashChange;
+
+            /*------------------------------------------------------*/
+            /*
+            * dialogCreate({ Title : 'Тестовый заголовок', Content : 'Тестовое содержимое', OkEvent : okCallback, CancelEvent : cancelCallback })
+            * создает диалоговое окно в центре экрана, возвращает объект dialog
+            * Если OkEvent задан, то есть кнопка "OK", при нажатии на которую вызывается okCallback. Аналогично с CancelEvent - кнопка "Отменить".
+            * Если CancelEvent не задан, то кнопка отсутствует, если OkEvent не задан, то при нажатии на кнопку "ОК" вызывается dialogDestroy
+            * dialogDestroy(dialog)
+            * убирает переданное диалоговое окно
+            * */
+            createDialog({Title: 'Test', Content: 'Some text'});
+
+            function createDialog (json) {
+                var title = json['Title'];
+                var content = json['Content'];
+                var okCallback = json['OkEvent'];
+                var cancelCallback = json['CancelCallback'];
+                var dialogWindow = document.createElement('div');
+                dialogWindow.classList.add('dialog');
+                var id = 'dialog-' + (document.querySelectorAll('.dialog').length + 1).toString();
+                dialogWindow.id = id;
+                dialogWindow.innerHTML = ['<div class="title">{title}</div>',
+                        '<div class="content">',
+                        '<span class="text-content">{text}</span>',
+                        '<input type="text">',
+                        '<div class="button-panel">',
+                        '<button class="ok" type="submit">OK</button>',
+                        '<button class="cancel">Cancel</button>',
+                        '</div>',
+                        '</div>'].join('');
+                // TODO "растянуть" блок контента, поместить окно в центре экрана
+                console.log(title, content, dialogWindow.innerHTML.search('{title}'));
+                var html = dialogWindow.innerHTML;
+                html = html.replace(/\{title}/, title);
+                html = html.replace(/\{text}/, content);
+                dialogWindow.innerHTML = html;
+
+                if (okCallback) {
+                    dialogWindow.getElementsByTagName('button')[0].onclick = okCallback;
+                } else {
+                    dialogWindow.getElementsByTagName('button')[0].onclick = destroyDialog(id);
+                }
+                if (cancelCallback) {
+                    dialogWindow.getElementsByTagName('button')[1].onclick = cancelCallback;
+                } else {
+                    var cancelButton = dialogWindow.getElementsByClassName('cancel')[0];
+                    cancelButton.parentNode.removeChild(cancelButton);
+                }
+
+                document.body.appendChild(dialogWindow);
+                return id;
+            }
+
+            function destroyDialog (dialogId) {
+                return function () {
+                    var dialogToDestroy = document.getElementById(dialogId);
+                    console.log(dialogToDestroy);
+                    dialogToDestroy.parentNode.removeChild(dialogToDestroy);
+                }
+            }
         </script>
     </body>
 </html>
