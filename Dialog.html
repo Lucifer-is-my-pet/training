@@ -10,20 +10,22 @@
         }
         .dialog {
             width: 400px;
-            height: 150px;
+            /*height: 150px;*/
             border: 1px solid #000;
             border-radius: 3px;
             z-index: 100;
             display: flex;
             flex-direction: column;
-            /*flex-wrap: wrap;*/
-            /*justify-content: center;*/
         }
 
         .title {
-            width: 100%;
-            height: 30px;
-            background-color: #bb1a1b; /*8A8EBB*/
+            background-color: #45a8bb;
+            padding: 3px;
+            border-bottom: 1px solid #000;
+        }
+
+        .title, .text-content {
+            font: 15px Arial, sans-serif;
         }
 
         .content {
@@ -39,6 +41,15 @@
             width: 100%;
             display: flex;
             justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        button {
+            min-width: 70px;
+        }
+
+        .text-content {
+            padding: 10px 0;
         }
 
         input {
@@ -48,21 +59,16 @@
 </head>
 <body>
     <script>
-        /*
-         * dialogCreate({ Title : 'Тестовый заголовок', Content : 'Тестовое содержимое', OkEvent : okCallback, CancelEvent : cancelCallback })
-         * создает диалоговое окно в центре экрана, возвращает объект dialog
-         * Если OkEvent задан, то есть кнопка "OK", при нажатии на которую вызывается okCallback. Аналогично с CancelEvent - кнопка "Отменить".
-         * Если CancelEvent не задан, то кнопка отсутствует, если OkEvent не задан, то при нажатии на кнопку "ОК" вызывается dialogDestroy
-         * dialogDestroy(dialog)
-         * убирает переданное диалоговое окно
-         * */
-        createDialog({Title: 'Test', Content: 'Some text'});
+        createDialog();
 
         function createDialog (json) {
-            var title = json['Title'];
-            var content = json['Content'];
+            if (!json) {
+                json = {};
+            }
+            var title = json['Title'] || 'Диалог';
+            var content = json['Content'] || 'Введите текст';
             var okCallback = json['OkEvent'];
-            var cancelCallback = json['CancelCallback'];
+            var cancelCallback = json['CancelEvent'];
             var dialogWindow = document.createElement('div');
             dialogWindow.classList.add('dialog');
             var id = 'dialog-' + (document.querySelectorAll('.dialog').length + 1).toString();
@@ -76,7 +82,6 @@
                 '<button class="cancel">Cancel</button>',
                 '</div>',
                 '</div>'].join('');
-            // TODO "растянуть" блок контента
             console.log(title, content, dialogWindow.innerHTML.search('{title}'));
             var html = dialogWindow.innerHTML;
             html = html.replace(/\{title}/, title);
