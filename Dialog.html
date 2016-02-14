@@ -60,6 +60,9 @@
 <body>
     <script>
         createDialog();
+        createDialog();
+        createDialog();
+        createDialog();
 
         function createDialog (json) {
             if (!json) {
@@ -70,46 +73,60 @@
             var okCallback = json['OkEvent'];
             var cancelCallback = json['CancelEvent'];
             var dialogWindow = document.createElement('div');
-            dialogWindow.classList.add('dialog');
-            var id = 'dialog-' + (document.querySelectorAll('.dialog').length + 1).toString();
-            dialogWindow.id = id;
-            dialogWindow.innerHTML = ['<div class="title">{title}</div>',
-                '<div class="content">',
-                '<span class="text-content">{text}</span>',
-                '<input type="text">',
-                '<div class="button-panel">',
-                '<button class="ok" type="submit">OK</button>',
-                '<button class="cancel">Cancel</button>',
-                '</div>',
-                '</div>'].join('');
-            console.log(title, content, dialogWindow.innerHTML.search('{title}'));
-            var html = dialogWindow.innerHTML;
-            html = html.replace(/\{title}/, title);
-            html = html.replace(/\{text}/, content);
+            dialogWindow.className = 'dialog';
+            dialogWindow.id = 'dialog-' + (document.querySelectorAll('.dialog').length + 1).toString();
+            dialogWindow.innerHTML = '<div class="title">?</div>\
+                <div class="content">\
+                <span class="text-content">?</span>\
+                <input type="text">\
+                <div class="button-panel">\
+                <button class="ok" type="submit">OK</button>\
+                <button class="cancel">Cancel</button>\
+                </div>\
+                </div>';
+            var html = formatString(dialogWindow.innerHTML, title, content);
             dialogWindow.innerHTML = html;
 
             if (okCallback) {
-                dialogWindow.getElementsByTagName('button')[0].onclick = okCallback;
+                getButton(dialogWindow)[0].onclick = okCallback;
             } else {
-                dialogWindow.getElementsByTagName('button')[0].onclick = destroyDialog(id);
+                getButton(dialogWindow)[0].onclick = destroyDialog(dialogWindow);
             }
             if (cancelCallback) {
-                dialogWindow.getElementsByTagName('button')[1].onclick = cancelCallback;
+                getButton(dialogWindow)[1].onclick = cancelCallback;
             } else {
                 var cancelButton = dialogWindow.getElementsByClassName('cancel')[0];
                 cancelButton.parentNode.removeChild(cancelButton);
             }
 
             document.body.appendChild(dialogWindow);
-            return id;
+            return dialogWindow;
         }
 
-        function destroyDialog (dialogId) {
+        function destroyDialog (dialog) {
             return function () {
-                var dialogToDestroy = document.getElementById(dialogId);
-                console.log(dialogToDestroy);
-                dialogToDestroy.parentNode.removeChild(dialogToDestroy);
+                dialog.parentNode.removeChild(dialog);
             }
+        }
+
+        function dragNDrop(event) {
+            if (!event) {
+                event = window.event;
+            }
+
+        }
+
+        function formatString (patternString) {
+            var replacers = [].slice.call(arguments).slice(1);
+            var result = patternString;
+            for (var i in replacers) {
+                result = result.replace(/\?/, replacers[i]);
+            }
+            return result;
+        }
+
+        function getButton (object) {
+            return object.getElementsByTagName('button');
         }
     </script>
 </body>
