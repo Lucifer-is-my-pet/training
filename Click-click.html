@@ -52,9 +52,6 @@
             }
 
             function reactOnDataChange (event) {
-                if (!event) {
-                    event = window.event;
-                }
                 event.preventDefault();
                 var newData = prompt('Введите новые данные', '');
                 if (newData) {
