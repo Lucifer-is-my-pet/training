@@ -3,7 +3,13 @@
     <head>
         <meta charset="utf-8">
         <title>Click-click</title>
+        <link type="text/css" href="Dialog.css" rel="stylesheet">
         <style>
+            body {
+                user-select: none;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+            }
             #addData {
                 width: 100px;
                 height: 50px;
@@ -11,18 +17,20 @@
             }
             a {
                 color: #000;
-            }</style>
+            }
+        </style>
     </head>
     <body>
         <a id="link-1" class="link" href="#1">Тык</a><br>
         <a id="link-2" class="link" href="#2">Клац</a><br>
         <div id="addData">
         </div>
+        <script src="Dialog.js"></script>
         <script type="text/javascript">
             reactOnHashChange();
 
             function reactOnHashChange () {
-                console.log(location.hash);
+//                console.log(location.hash);
                 var hash = location.hash.substr(1);
                 addDataToDiv(getUrl());
 
@@ -53,7 +61,12 @@
 
             function reactOnDataChange (event) {
                 event.preventDefault();
-                var newData = prompt('Введите новые данные', '');
+                var newDialog = createDialog({Title: 'Изменить', OkEvent: getInput});
+            }
+
+            function getInput(event) {
+                var dialog = event.target.closest('.dialog');
+                var newData = dialog.querySelector('input').value;
                 if (newData) {
                     var url = getUrl() + '&value=' + encodeURIComponent(newData);
                     getData(url, function (json) {
@@ -62,19 +75,19 @@
                         }
                     });
                 }
+                destroyDialog(dialog);
             }
 
             //вспомогательные функции
-            function getData(url, func) {
+            function getData(url, func) { // xhr
                 var http = new XMLHttpRequest();
                 http.open('GET', url);
                 http.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
-                        var jsonResp;
+                        var jsonResp = {};
                         try {
                             jsonResp = JSON.parse(this.responseText);
                         } catch (e) {
-                            jsonResp = {};
                         }
                         func(jsonResp);
                     }
@@ -86,13 +99,11 @@
                 return 'http://78.47.75.106/e/test&par=' + location.hash.substr(1);
             }
 
-            function getById(id) {
+            function getById(id) { // utils
                 return document.getElementById(id);
             }
 
             onhashchange = reactOnHashChange;
-
-            /*------------------------------------------------------*/
             </script>
     </body>
 </html>
