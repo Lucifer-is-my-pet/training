@@ -9,12 +9,10 @@
             /*display: flex;*/
             /*justify-content: center;*/
             position: relative;
+            height: 800px;
         }
         .dialog {
             position: absolute;
-            left: 0;
-            right: 0;
-            margin: auto;
             width: 400px;
             border: 1px solid #000;
             border-radius: 3px;
@@ -31,6 +29,10 @@
 
         .title, .text-content {
             font: 15px Arial, sans-serif;
+            cursor: default;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
         }
 
         .content {
@@ -102,9 +104,32 @@
             }
 
             document.body.appendChild(dialogWindow);
+            dialogWindow.style.left = (window.innerWidth - dialogWindow.clientWidth) / 2 + 'px';
+            dialogWindow.style.top = (window.innerHeight - dialogWindow.clientHeight) / 2 + 'px';
 
-            dialogWindow.getElementsByClassName('title')[0].onmousedown = function (event) {
+            var clicked = false;
+            var shiftX = 0;
+            var shiftY = 0;
+            document.getElementsByClassName('title')[0].onmousedown = function (event) {
+                if (event.which != 1) {
+                    return;
+                }
+                var coordinates = getCoordinates(dialogWindow);
+                shiftX = event.pageX - coordinates.left;
+                shiftY = event.pageY - coordinates.top;
 
+                clicked = true;
+            };
+            document.onmousemove = function (event) {
+                if (clicked) {
+                    dialogWindow.style.left = event.pageX - shiftX + 'px';
+                    dialogWindow.style.top = event.pageY - shiftY + 'px';
+                }
+            };
+            document.onmouseup = function () {
+                if (clicked) {
+                    clicked = false;
+                }
             };
 
             return dialogWindow;
@@ -120,6 +145,15 @@
                 result = result.replace(/\?/, arguments[i]);
             }
             return result;
+        }
+
+        function getCoordinates(elem) { // кроме IE8-
+            var box = elem.getBoundingClientRect();
+
+            return {
+                top: box.top + pageYOffset,
+                left: box.left + pageXOffset
+            };
         }
 
     </script>
