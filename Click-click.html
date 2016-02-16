@@ -3,34 +3,21 @@
     <head>
         <meta charset="utf-8">
         <title>Click-click</title>
-        <link type="text/css" href="Dialog.css" rel="stylesheet">
-        <style>
-            body {
-                user-select: none;
-                -webkit-user-select: none;
-                -moz-user-select: none;
-            }
-            #addData {
-                width: 100px;
-                height: 50px;
-                border: 1px solid #000;
-            }
-            a {
-                color: #000;
-            }
-        </style>
+        <link type="text/css" href="css/Dialog.css" rel="stylesheet">
+        <link type="text/css" href="css/Click-click.css" rel="stylesheet">
     </head>
     <body>
         <a id="link-1" class="link" href="#1">Тык</a><br>
         <a id="link-2" class="link" href="#2">Клац</a><br>
         <div id="addData">
         </div>
-        <script src="Dialog.js"></script>
+        <script src="js/Dialog.js"></script>
+        <script src="js/XHR.js"></script>
+        <script src="js/Utils.js"></script>
         <script type="text/javascript">
             reactOnHashChange();
 
             function reactOnHashChange () {
-//                console.log(location.hash);
                 var hash = location.hash.substr(1);
                 addDataToDiv(getUrl());
 
@@ -79,31 +66,19 @@
             }
 
             //вспомогательные функции
-            function getData(url, func) { // xhr
-                var http = new XMLHttpRequest();
-                http.open('GET', url);
-                http.onreadystatechange = function () {
-                    if (this.readyState == 4 && this.status == 200) {
-                        var jsonResp = {};
-                        try {
-                            jsonResp = JSON.parse(this.responseText);
-                        } catch (e) {
-                        }
-                        func(jsonResp);
-                    }
-                };
-                http.send(null);
-            }
-
             function getUrl () {
                 return 'http://78.47.75.106/e/test&par=' + location.hash.substr(1);
             }
 
-            function getById(id) { // utils
-                return document.getElementById(id);
-            }
-
             onhashchange = reactOnHashChange;
+            // 1. bundle.pl перловый скрипт, модуль file::find находит файлы с расширением js, объединяет в один большой,
+            // скармливает yui компрессору и вставляет в html его. результат - bundle.html
+            // аналогично - с css.
+            // всё - в head
+
+            // 2. "фишечки", ня. делаем это в bundle.pl
+            // многострочные строки - берёт многострочную строку, парсит так, чтобы скормить javascript, убирая табы и переводы строк (т.е. без слэшей)
+            // интерполяция - $ в строке, разорвать, чтобы скормить javascript
             </script>
     </body>
 </html>
