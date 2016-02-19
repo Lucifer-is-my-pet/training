@@ -1,6 +1,4 @@
-reactOnHashChange();
-
-function reactOnHashChange () {
+function main () { // reactOnHashChange
     var hash = location.hash.substr(1);
     addDataToDiv(getUrl());
 
@@ -12,7 +10,7 @@ function reactOnHashChange () {
 
         if (link.getAttribute('href').substr(1) == hash) {
             link.style.fontWeight = 'bold';
-            link.onclick = reactOnHashChange;
+            link.onclick = main;
         }
     }
 }
@@ -41,7 +39,7 @@ function getInput(event) {
         var url = getUrl() + '&value=' + encodeURIComponent(newData);
         getData(url, function (json) {
             if (json['Result'] == 'OK') {
-                reactOnHashChange();
+                main();
             }
         });
     }
@@ -53,4 +51,4 @@ function getUrl () {
     return 'http://78.47.75.106/e/test&par=' + location.hash.substr(1);
 }
 
-onhashchange = reactOnHashChange;
+onhashchange = main;

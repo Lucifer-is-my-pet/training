@@ -8,18 +8,18 @@ function createDialog (json) {
     var cancelCallback = json['CancelEvent'];
     var dialogWindow = document.createElement('div');
     dialogWindow.className = 'dialog';
-    var html = '\
-<div class="title">?</div>\
-<div class="content">\
-    <span class="text-content">?</span>\
-    <input type="text">\
-    <div class="button-panel">\
-        <button class="ok" type="submit">OK</button>\
-        <button class="cancel">Cancel</button>\
-    </div>\
-</div>\
-';
-    dialogWindow.innerHTML = formatString(html, title, content);
+    var html = <<HTML;
+<div class='title'>$title</div>
+<div class='content'>
+    <span class='text-content'>$content</span>
+    <input type='text'>
+    <div class='button-panel'>
+        <button class='ok' type='submit'>OK</button>
+        <button class='cancel'>Cancel</button>
+    </div>
+</div>
+HTML
+    dialogWindow.innerHTML = html;
     var buttons = dialogWindow.querySelectorAll('button');
     if (okCallback) {
         buttons[0].onclick = okCallback;
@@ -37,7 +37,7 @@ function createDialog (json) {
     dialogWindow.style.left = (window.innerWidth - dialogWindow.clientWidth) / 2 + 'px';
     dialogWindow.style.top = (window.innerHeight - dialogWindow.clientHeight) / 2 + 'px';
 
-    //TODO координаты угла, координаты курсора. сменились у курсора — вычисляему у угла
+    //TODO координаты угла, координаты курсора. сменились у курсора — вычисляем у угла
     var clicked = false;
     var shiftX = 0;
     var shiftY = 0;
